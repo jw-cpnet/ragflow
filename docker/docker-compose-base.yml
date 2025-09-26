@@ -190,7 +190,7 @@ services:
   minio:
     image: quay.io/minio/minio:RELEASE.2025-06-13T11-33-47Z
     container_name: ragflow-minio
-    command: server --console-address ":9001" /data
+    command: server --address ":9002" --console-address ":9001" /data
     ports:
       - ${MINIO_PORT}:9002
       - ${MINIO_CONSOLE_PORT}:9001
