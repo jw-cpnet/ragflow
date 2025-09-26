@@ -6,7 +6,7 @@ include:
 services:
   ragflow:
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     image: ${RAGFLOW_IMAGE}
     container_name: ragflow-server
