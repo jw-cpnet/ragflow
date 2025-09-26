@@ -133,6 +133,28 @@ services:
       retries: 5
     restart: on-failure
 
+  postgres:
+    image: postgres:16-alpine
+    container_name: ragflow-postgres
+    env_file: .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DBNAME}
+      - TZ=${TIMEZONE}
+    ports:
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ragflow
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DBNAME}"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+
   mysql:
     # mysql:5.7 linux/arm64 image is unavailable.
     image: mysql:8.0.39
@@ -168,7 +190,7 @@ services:
     container_name: ragflow-minio
     command: server --console-address ":9001" /data
     ports:
-      - ${MINIO_PORT}:9000
+      - ${MINIO_PORT}:9002
       - ${MINIO_CONSOLE_PORT}:9001
     env_file: .env
     environment:
@@ -181,7 +203,7 @@ services:
       - ragflow
     restart: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://localhost:9002/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
@@ -214,6 +236,8 @@ volumes:
   osdata01:
     driver: local
   infinity_data:
+    driver: local
+  postgres_data:
     driver: local
   mysql_data:
     driver: local
